@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vs2lma</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">vs2lma</span>
+        <span class="version">v0.0.8</span>
+        <select id="lang-switch" class="lang-switch" title="Language">
+          <option value="en">EN</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+      <div class="header-center">
+        <span id="status-dot" class="status-dot stopped"></span>
+        <span id="status-text" class="status-text">Stopped</span>
+        <span id="status-addr" class="status-addr"></span>
+      </div>
+      <div class="header-right">
+        <button id="btn-toggle-server" class="btn btn-primary">Start Server</button>
+      </div>
+    </header>
+
+    <!-- Tab bar -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="config">Configuration</button>
+    </nav>
+
+    <!-- Dashboard tab -->
+    <section id="tab-dashboard" class="tab-content active">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Uptime</div>
+          <div id="uptime" class="stat-value">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Requests</div>
+          <div id="req-count" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Models</div>
+          <div id="model-count" class="stat-value">--</div>
+        </div>
+      </div>
+
+      <div class="log-section">
+        <div class="log-header">
+          <span>Request Log</span>
+          <button id="btn-clear-logs" class="btn btn-sm">Clear</button>
+        </div>
+        <div class="log-table-wrap">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Method</th>
+                <th>Path</th>
+                <th>Status</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="log-body">
+              <tr><td colspan="5" class="log-empty">No requests yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Configuration tab -->
+    <section id="tab-config" class="tab-content">
+      <form id="config-form" class="config-form">
+        <div class="form-group">
+          <label for="base-url">Base API URL</label>
+          <input type="url" id="base-url" placeholder="https://api.deepseek.com" autocomplete="off" />
+          <span class="field-error" data-field="baseUrl"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="api-key">API Key</label>
+          <div class="password-wrap">
+            <input type="password" id="api-key" placeholder="sk-..." autocomplete="off" />
+            <button type="button" id="btn-toggle-key" class="btn-icon" title="Show/hide">&#x1f441;</button>
+          </div>
+          <span class="field-error" data-field="apiKey"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="host">Host</label>
+            <input type="text" id="host" placeholder="localhost" />
+          </div>
+          <div class="form-group">
+            <label for="port">Port</label>
+            <input type="number" id="port" placeholder="11434" min="1" max="65535" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="cap-tools" checked />
+            <span>Tools capability</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="cap-thinking" />
+            <span>Thinking capability</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="auto-start" />
+            <span>Auto-start server on launch</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="minimize-tray" checked />
+            <span>Minimize to tray on close</span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btn-test" class="btn btn-secondary">Test Connection</button>
+          <button type="submit" class="btn btn-primary">Save Config</button>
+        </div>
+      </form>
+
+      <div id="test-result" class="test-result hidden"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span id="footer-msg"></span>
+    </footer>
+  </div>
+
+  <!-- Error Alert Overlay -->
+  <div id="alert-overlay" class="alert-overlay hidden">
+    <div class="alert-dialog">
+      <div class="alert-header">
+        <span id="alert-title">Error</span>
+        <button id="alert-close" class="alert-close">&times;</button>
+      </div>
+      <pre id="alert-body" class="alert-body"></pre>
+      <div class="alert-actions">
+        <button id="alert-copy" class="btn btn-secondary">Copy</button>
+        <button id="alert-dismiss" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

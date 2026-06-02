@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicest/tauri/dev/crates/tauri-config-schema/schema.json",
+  "productName": "vs2lma",
+  "version": "0.0.8",
+  "identifier": "com.vs2lma.app",
+  "build": {
+    "frontendDist": "../app",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "vs2lma",
+        "label": "main",
+        "width": 680,
+        "height": 520,
+        "minWidth": 500,
+        "minHeight": 400,
+        "resizable": true,
+        "visible": false,
+        "center": true
+      }
+    ],
+    "trayIcon": {
+      "iconPath": "icons/tray-icon.png",
+      "iconAsTemplate": false,
+      "tooltip": "vs2lma"
+    },
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ]
+  }
+}

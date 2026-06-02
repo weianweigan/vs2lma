@@ -1,0 +1,40 @@
+{
+  "name": "vs2lma",
+  "type": "module",
+  "version": "0.0.8",
+  "author": "wrtx",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && node scripts/add-shebang.js",
+    "start": "npm run build && node dist/index.js",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.18.1",
+    "@types/yargs": "^17.0.33",
+    "dotenv": "^17.2.1",
+    "hono": "^4.9.0",
+    "yargs": "^17.7.2"
+  },
+  "bin": {
+    "vs2lma": "./dist/index.js"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2",
+    "@types/node": "^20.11.17",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "DeepSeek",
+    "Ollama",
+    "github copilot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wrtx-dev/vs2lma.git"
+  },
+  "license": "MIT"
+}
