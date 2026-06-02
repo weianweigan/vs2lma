@@ -91,6 +91,12 @@ The server provides Ollama-compatible endpoints:
 - Desktop wrapper built with [Tauri](https://tauri.app/)
 - Server framework: [Hono](https://hono.dev/)
 
+## Screenshots
+
+<img src="assets/ui.png" width="600" alt="vs2lma UI" />
+
+<img src="assets/visual studio.png" width="600" alt="Visual Studio integration" />
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

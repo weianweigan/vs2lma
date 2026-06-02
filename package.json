@@ -1,11 +1,12 @@
 {
   "name": "vs2lma",
   "type": "module",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "author": "wrtx",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc && node scripts/add-shebang.js",
+    "build:sea": "node scripts/build-sea.cjs",
     "start": "npm run build && node dist/index.js",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
@@ -24,6 +25,8 @@
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.2",
     "@types/node": "^20.11.17",
+    "esbuild": "^0.28.0",
+    "postject": "^1.0.0-alpha.6",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   },

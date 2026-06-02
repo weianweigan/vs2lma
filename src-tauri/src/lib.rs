@@ -157,15 +157,31 @@ async fn do_start_server(app: &AppHandle) -> Result<ServerStatus, String> {
         v
     };
 
-    // Resolve dist/index.js relative to project root (parent of src-tauri/)
-    let project_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap_or(std::path::Path::new("."))
-        .to_path_buf();
-    let dist_path = project_root.join("dist").join("index.js");
+    // Find proxy-server.exe in resource directory (standalone SEA exe, no Node.js needed)
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .unwrap_or_default();
+    let proxy_exe = resource_dir.join("proxy-server.exe");
+    let proxy_exe_display = proxy_exe.clone();
 
-    let mut args: Vec<String> = vec![
-        dist_path.to_string_lossy().to_string(),
+    // Fallback: during dev without SEA build, try node + dist/index.js
+    let (exe, exe_args) = if proxy_exe.exists() {
+        (proxy_exe, vec![])
+    } else {
+        let project_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .to_path_buf();
+        let dist_path = project_root.join("dist").join("index.js");
+        (
+            std::path::PathBuf::from("node"),
+            vec![dist_path.to_string_lossy().to_string()],
+        )
+    };
+
+    let mut args: Vec<String> = exe_args;
+    args.extend(vec![
         "--url".into(),
         config.base_url.clone(),
         "--apikey".into(),
@@ -174,18 +190,18 @@ async fn do_start_server(app: &AppHandle) -> Result<ServerStatus, String> {
         config.host.clone(),
         "--port".into(),
         config.port.to_string(),
-    ];
+    ]);
     if !caps.is_empty() {
         args.push("--cap".into());
         args.extend(caps);
     }
 
-    let child = Command::new("node")
+    let child = Command::new(&exe)
         .args(&args)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
-        .map_err(|e| format!("Failed to start Node.js server: {}. Is Node.js installed and in PATH?", e))?;
+        .map_err(|e| format!("Failed to start proxy server: {}. The proxy-server.exe is expected at {:?}", e, proxy_exe_display))?;
 
     {
         let state = app.state::<AppState>();

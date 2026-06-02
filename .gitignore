@@ -17,10 +17,12 @@ node_modules/
 
 # build output
 dist/
+dist-bundle/
 
 # Tauri / Rust
 src-tauri/target/
 src-tauri/gen/
+src-tauri/binary/
 
 # logs
 logs/

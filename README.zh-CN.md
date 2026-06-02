@@ -91,6 +91,12 @@ export API_KEY="your-api-key"
 - 桌面包装使用 [Tauri](https://tauri.app/) 构建
 - 服务器框架：[Hono](https://hono.dev/)
 
+## 截图
+
+<img src="assets/ui.png" width="600" alt="vs2lma 界面" />
+
+<img src="assets/visual studio.png" width="600" alt="Visual Studio 集成" />
+
 ## 许可证
 
 [MIT](https://choosealicense.com/licenses/mit/)

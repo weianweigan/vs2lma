@@ -29,8 +29,57 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Extract version from tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace '^v', ''
+          Write-Output "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Output "Extracted version: $version from tag: $tag"
+
+      - name: Inject version into source files
+        shell: pwsh
+        run: |
+          $v = $env:VERSION
+          Write-Output "Setting version to $v"
+
+          # package.json — replace version field
+          $pkg = Get-Content package.json -Raw
+          $pkg = $pkg -replace '"version"\s*:\s*"[^"]*"', '"version": "$v"'
+          Set-Content package.json -Value $pkg -NoNewline
+
+          # tauri.conf.json
+          $tc = Get-Content src-tauri/tauri.conf.json -Raw
+          $tc = $tc -replace '"version"\s*:\s*"[^"]*"', '"version": "$v"'
+          Set-Content src-tauri/tauri.conf.json -Value $tc -NoNewline
+
+          # Cargo.toml
+          $ct = Get-Content src-tauri/Cargo.toml -Raw
+          $ct = $ct -replace 'version\s*=\s*"[^"]*"', "version = ""$v"""
+          Set-Content src-tauri/Cargo.toml -Value $ct -NoNewline
+
+          # index.html
+          $html = Get-Content app/index.html -Raw
+          $html = $html -replace 'v\d+\.\d+\.\d+', "v$v"
+          Set-Content app/index.html -Value $html -NoNewline
+
+          Write-Output "Version injection complete: $v"
+
       - name: Build TypeScript proxy
         run: npm run build
+
+      - name: Build standalone proxy exe (Node.js SEA)
+        run: npm run build:sea
+
+      - name: Inject resources into tauri.conf.json
+        shell: pwsh
+        run: |
+          $tc = Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json
+          $tc.bundle | Add-Member -NotePropertyName "resources" -NotePropertyValue @{
+            "binary/proxy-server.exe" = "proxy-server.exe"
+          } -Force
+          $tc | ConvertTo-Json -Depth 10 | Set-Content src-tauri/tauri.conf.json -NoNewline
+          Write-Output "Injected resources config"
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
@@ -40,14 +89,25 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: "vs2lma ${{ github.ref_name }}"
           releaseBody: |
-            See [CHANGELOG.md](./CHANGELOG.md) for details.
+            ## vs2lma ${{ github.ref_name }}
+
+            Windows desktop application wrapping a proxy server for using DeepSeek/OpenAI APIs through Ollama-compatible endpoints.
+
+            ### Features
+            - System tray with start/stop control
+            - Configuration UI with connection testing
+            - Real-time request monitoring
+            - Bilingual (English / Chinese)
 
             ### Install
-            - Download the `.msi` installer for a standard setup
-            - Or use the `.exe` installer for a portable installation
+            - Download the `.msi` or `.exe` setup below
+            - **No Node.js installation required** — the proxy engine is bundled
 
-            ### Prerequisites
-            - [Node.js](https://nodejs.org/) v18+ must be installed separately
-            - Windows 10+ with WebView2 (pre-installed on most systems)
+            ### Setup
+            1. Launch vs2lma
+            2. Enter your API key and base URL in the Configuration tab
+            3. Click **Test Connection** to verify
+            4. Click **Start Server** to begin proxying
+            5. Configure your client to use `http://localhost:11434`
           releaseDraft: false
           prerelease: false
