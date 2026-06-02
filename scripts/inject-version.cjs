@@ -19,10 +19,10 @@ if (!/^\d+\.\d+\.\d+/.test(version)) {
 const root = path.resolve(__dirname, "..");
 
 const replacements = [
-  { file: "package.json",             from: /"version"\s*:\s*"[^"]*"/g, to: `"version": "${version}"` },
-  { file: "src-tauri/tauri.conf.json", from: /"version"\s*:\s*"[^"]*"/g, to: `"version": "${version}"` },
-  { file: "src-tauri/Cargo.toml",      from: /version\s*=\s*"[^"]*"/g,  to: `version = "${version}"` },
-  { file: "app/index.html",            from: /v\d+\.\d+\.\d+/g,         to: `v${version}` },
+  { file: "package.json",                  from: /"version"\s*:\s*"[^"]*"/g, to: `"version": "${version}"` },
+  { file: "src-tauri/tauri.conf.json",     from: /"version"\s*:\s*"[^"]*"/g, to: `"version": "${version}"` },
+  { file: "src-tauri/Cargo.toml",          from: /^version\s*=\s*"[^"]*"/m,  to: `version = "${version}"` },
+  { file: "app/index.html",                from: /v\d+\.\d+\.\d+/g,          to: `v${version}` },
 ];
 
 for (const r of replacements) {
