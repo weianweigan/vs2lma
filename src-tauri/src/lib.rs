@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::os::windows::process::CommandExt;
 use std::path::PathBuf;
 use std::process::{Child, Command};
 use std::sync::Mutex;
@@ -198,6 +199,7 @@ async fn do_start_server(app: &AppHandle) -> Result<ServerStatus, String> {
 
     let child = Command::new(&exe)
         .args(&args)
+        .creation_flags(0x08000000) // CREATE_NO_WINDOW
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
