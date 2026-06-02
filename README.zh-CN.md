@@ -100,6 +100,3 @@ export API_KEY="your-api-key"
 ## 许可证
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-
-![](assets/ui.png)

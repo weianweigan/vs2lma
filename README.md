@@ -100,5 +100,3 @@ The server provides Ollama-compatible endpoints:
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-![](assets/ui.png)
