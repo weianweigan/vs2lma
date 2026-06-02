@@ -29,56 +29,17 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Inject version from tag into all source files
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}"
-          $v = $tag -replace '^v', ''
-          "VERSION=$v" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          Write-Output "Version: $v (from tag: $tag)"
-
-          $utf8 = New-Object System.Text.UTF8Encoding($false)
-
-          # package.json
-          $pkg = [System.IO.File]::ReadAllText("$pwd\package.json")
-          $pkg = $pkg -replace '"version"\s*:\s*"[^"]*"', '"version": "$v"'
-          [System.IO.File]::WriteAllText("$pwd\package.json", $pkg, $utf8)
-
-          # tauri.conf.json
-          $tc = [System.IO.File]::ReadAllText("$pwd\src-tauri\tauri.conf.json")
-          $tc = $tc -replace '"version"\s*:\s*"[^"]*"', '"version": "$v"'
-          [System.IO.File]::WriteAllText("$pwd\src-tauri\tauri.conf.json", $tc, $utf8)
-
-          # Cargo.toml
-          $ct = [System.IO.File]::ReadAllText("$pwd\src-tauri\Cargo.toml")
-          $ct = $ct -replace 'version\s*=\s*"[^"]*"', "version = ""$v"""
-          [System.IO.File]::WriteAllText("$pwd\src-tauri\Cargo.toml", $ct, $utf8)
-
-          # index.html
-          $html = [System.IO.File]::ReadAllText("$pwd\app\index.html")
-          $html = $html -replace 'v\d+\.\d+\.\d+', "v$v"
-          [System.IO.File]::WriteAllText("$pwd\app\index.html", $html, $utf8)
-
-          Write-Output "Version injected in all source files"
+      - name: Inject version and resources
+        run: node scripts/inject-version.cjs ${{ github.ref_name }}
 
       - name: Build TypeScript proxy
         run: npm run build
 
-      - name: Build standalone proxy exe (Node.js SEA)
+      - name: Build standalone proxy exe
         run: npm run build:sea
 
-      - name: Inject resources into tauri.conf.json
-        shell: pwsh
-        run: |
-          $utf8 = New-Object System.Text.UTF8Encoding($false)
-          $tc = [System.IO.File]::ReadAllText("$pwd\src-tauri\tauri.conf.json")
-          $j = $tc | ConvertFrom-Json
-          $j.bundle | Add-Member -NotePropertyName "resources" -NotePropertyValue @{
-            "binary/proxy-server.exe" = "proxy-server.exe"
-          } -Force
-          $out = $j | ConvertTo-Json -Depth 10
-          [System.IO.File]::WriteAllText("$pwd\src-tauri\tauri.conf.json", $out, $utf8)
-          Write-Output "Resources config injected"
+      - name: Inject SEA exe into Tauri resources
+        run: node -e "const f=require('fs'),p='src-tauri/tauri.conf.json';let c=JSON.parse(f.readFileSync(p,'utf8'));c.bundle=c.bundle||{};c.bundle.resources={'binary/proxy-server.exe':'proxy-server.exe'};f.writeFileSync(p,JSON.stringify(c,null,2))"
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
